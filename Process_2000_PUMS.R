@@ -5,12 +5,12 @@
 #This script processes a Census 5% Public Use Microdata Sample Equivalency
 #file (PUMEQ5) from the 2000 Census for a state to produce files that need
 #to be included in the VESimHouseholds package of the VisionEval model
-#system and used to estimate model parameters for the CreateHouseholds, 
-PredictWorkers, PredictIncome, and PredictHousing modules. The script
+#system and used to estimate model parameters for the CreateHouseholds,
+#PredictWorkers, PredictIncome, and PredictHousing modules. The script
 #references the file downloaded from the Census for the State of Oregon, but can
 #be modified to process the data for another state. The user can download
 #the data for another state from the census at the following URL:
-#https://www2.census.gov/census_2000/datasets/PUMS/FivePercent/PUMS 
+#https://www2.census.gov/census_2000/datasets/PUMS/FivePercent/PUMS
 #After downloading the desired state file, the user will need to identify the
 #path to the downloaded file in the code in SECTION A below. The user may also
 #identify specific PUMAs to extract if the data for a specific metropolitan
@@ -28,7 +28,7 @@ PredictWorkers, PredictIncome, and PredictHousing modules. The script
 #------------------------------------
 #Identify the full path name to the PUMEQ5 file that data is to be processed. See
 #notes above on acquiring the Census file.
-PumsFile <- "REVISEDPUMS5_41.TXT"
+PumsFile <- "REVISEDPUMS5_51.TXT" # 41 for Oregon, 51 for Virginia
 
 #Identify the PUMAs to select
 #----------------------------
@@ -38,6 +38,8 @@ GetPumas <- "ALL"
 #code (Oregon example)
 #GetPumas <- c("41501", "41502", "41503")
 
+# Specify the data directory
+data_directory = 'all_Virginia'
 
 #---------------------------------------------------------
 #SECTION B: READ IN AND EXTRACT HOUSEHOLD AND PERSONS DATA
@@ -45,8 +47,8 @@ GetPumas <- "ALL"
 
 #Read in file and split out household and person tables
 #------------------------------------------------------
-Pums_ <- readLines(PumsFile)
-RecordType_ <- 
+Pums_ <- readLines(file.path(data_directory, PumsFile))
+RecordType_ <-
   as.vector(sapply(Pums_, function(x) {
     substr(x, 1, 1)
     }))
@@ -56,7 +58,7 @@ rm(Pums_, RecordType_, PumsFile)
 
 #Define a function to extract specified PUMS data and put in data frame
 #----------------------------------------------------------------------
-extractFromPums <- 
+extractFromPums <-
   function(Pums_, Fields_ls) {
     lapply(Fields_ls, function(x) {
       x$typeFun(unlist(lapply(Pums_, function(y) {
@@ -121,8 +123,8 @@ rm(P_, PFields_ls)
 #Save the household file
 #-----------------------
 write.table(
-  H_df, 
-  file = "pums_households.csv", 
+  H_df,
+  file = file.path(data_directory, "pums_households.csv"),
   row.names = FALSE,
   col.names = TRUE,
   sep = ",")
@@ -130,8 +132,8 @@ write.table(
 #Save the persons file
 #---------------------
 write.table(
-  P_df, 
-  file = "pums_persons.csv", 
+  P_df,
+  file = file.path(data_directory, "pums_persons.csv"),
   row.names = FALSE,
   col.names = TRUE,
   sep = ",")
